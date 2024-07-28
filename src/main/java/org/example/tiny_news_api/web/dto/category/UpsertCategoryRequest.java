@@ -1,4 +1,4 @@
-package org.example.tiny_news_api.dto;
+package org.example.tiny_news_api.web.dto.category;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExceptionDto {
+public class UpsertCategoryRequest {
 
-    private String message;
+    private String title;
+
 }

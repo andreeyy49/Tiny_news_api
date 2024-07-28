@@ -1,43 +1,47 @@
 package org.example.tiny_news_api.service;
 
-import org.example.tiny_news_api.dto.NewsDto;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.example.tiny_news_api.entity.News;
+import org.example.tiny_news_api.repository.NewsRepository;
 import org.springframework.stereotype.Service;
 
+import java.text.MessageFormat;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class NewsService {
 
-    private final ConcurrentHashMap<Long, NewsDto> data = new ConcurrentHashMap<>();
+    private final NewsRepository newsRepository;
 
-    public Collection<NewsDto> findAll() {
-        return data.values();
+    public List<News> findAll() {
+        return newsRepository.findAll();
     }
 
-    public NewsDto findById(long id) {
-        return data.get(id);
+    public News findById(long id) {
+        return newsRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format("Новость с id:{0} не найдена", id)));
     }
 
-    public NewsDto create(NewsDto newsDto) {
-        long lastId = data.size() + 1;
-        newsDto.setId(lastId);
-        newsDto.setDate(Instant.now());
-        data.put(lastId, newsDto);
+    public News create(News news) {
+        news.setDate(Instant.now());
 
-        return data.get(newsDto.getId());
+        return newsRepository.save(news);
     }
 
-    public NewsDto update(Long id, NewsDto newsDto) {
-        newsDto.setId(id);
-        newsDto.setDate(Instant.now());
-        data.put(id, newsDto);
+    public News update(Long id, News news) {
+        News updatedNews = findById(id);
+        updatedNews.setTitle(news.getTitle());
+        updatedNews.setDate(news.getDate());
+        updatedNews.setText(news.getText());
+        updatedNews.setDate(Instant.now());
 
-        return data.get(id);
+        return newsRepository.save(updatedNews);
     }
 
     public void delete(Long id) {
-        data.remove(id);
+        newsRepository.deleteById(id);
     }
 }
